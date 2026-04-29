@@ -12,7 +12,8 @@ export type BoothAppState =
 
 export type StickerPlacement = {
   id: string;
-  emoji: string;
+  stickerId: string;
+  stickerSrc: string;
   x: number;
   y: number;
   size: number;
@@ -41,13 +42,14 @@ type BoothStore = {
 };
 
 const defaultLayout = getLayoutById("A");
+const defaultFrameColor = "#ffffff";
 
 export const useBoothStore = create<BoothStore>((set) => ({
   appState: "WELCOME",
   selectedLayout: defaultLayout,
   capturedPhotos: [],
   activeFilter: "none",
-  selectedFrameColor: "#ffffff",
+  selectedFrameColor: defaultFrameColor,
   addedStickers: [],
   finalMergedImage: null,
   countdownSeconds: 3,
@@ -69,7 +71,7 @@ export const useBoothStore = create<BoothStore>((set) => ({
       selectedLayout: defaultLayout,
       capturedPhotos: [],
       activeFilter: "none",
-      selectedFrameColor: "#ffffff",
+      selectedFrameColor: defaultFrameColor,
       addedStickers: [],
       finalMergedImage: null,
       countdownSeconds: 3,
