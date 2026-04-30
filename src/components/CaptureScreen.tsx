@@ -35,6 +35,7 @@ export function CaptureScreen() {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [livePreview, setLivePreview] = useState<string | null>(null);
+  const captureComplete = capturedPhotos.length >= selectedLayout.poses;
 
   const filterCss = useMemo(() => getFilterCss(activeFilter), [activeFilter]);
 
@@ -84,14 +85,12 @@ export function CaptureScreen() {
     }
 
     setIsCapturing(false);
-    setAppState("CUSTOMIZE");
   }, [
     addCapturedPhoto,
     capturedPhotos.length,
     countdownSeconds,
     isCapturing,
     selectedLayout.poses,
-    setAppState,
   ]);
 
   const fileToDataUrl = (file: File) =>
@@ -117,22 +116,26 @@ export function CaptureScreen() {
       try {
         const uploaded = await Promise.all(files.map((file) => fileToDataUrl(file)));
         setCapturedPhotos(uploaded);
-        setAppState("CUSTOMIZE");
       } catch {
         setUploadError("Some images could not be read. Please try again.");
       } finally {
         setIsUploading(false);
       }
     },
-    [selectedLayout.poses, setAppState, setCapturedPhotos]
+    [selectedLayout.poses, setCapturedPhotos]
   );
 
   return (
     <section className="mx-auto mt-3 grid max-w-6xl grid-cols-1 gap-8 px-4 pb-10 lg:grid-cols-[2fr_1fr]">
       <div>
-        <div className="mb-3 flex flex-wrap gap-2">
+        <div className="sticky top-24 z-20 mb-3 flex flex-wrap gap-2 rounded-2xl border border-slate-200 bg-white/85 p-2 backdrop-blur">
           <Button onClick={() => setAppState("LAYOUT_SELECT")}>Back to Layout</Button>
           <Button onClick={handleRetake}>Retake All</Button>
+          {captureComplete && (
+            <Button variant="primary" onClick={() => setAppState("CUSTOMIZE")}>
+              Continue
+            </Button>
+          )}
         </div>
         <div className="mb-4 flex gap-2">
           <Button variant={captureMode === "camera" ? "primary" : "default"} onClick={() => setCaptureMode("camera")}>
@@ -207,8 +210,17 @@ export function CaptureScreen() {
                 <option value={5}>5s</option>
               </select>
             </div>
-            <Button variant="primary" className="mt-4 px-8 py-3" disabled={isCapturing} onClick={startCapture}>
-              {isCapturing ? "Capturing..." : `Start Capture (${selectedLayout.poses} photos)`}
+            <Button
+              variant="primary"
+              className="mt-4 px-8 py-3"
+              disabled={isCapturing || captureComplete}
+              onClick={startCapture}
+            >
+              {isCapturing
+                ? "Capturing..."
+                : captureComplete
+                  ? "Capture Complete"
+                  : `Start Capture (${selectedLayout.poses} photos)`}
             </Button>
           </>
         )}

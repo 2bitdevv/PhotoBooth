@@ -57,7 +57,7 @@ export function NavBar() {
           </button>
 
           {isOpen && (
-            <div className="absolute right-0 top-14 z-30 w-56 rounded-2xl border border-slate-200 bg-white p-3 shadow-lg md:hidden">
+            <div className="absolute left-1/2 top-16 z-30 w-[88vw] max-w-xs -translate-x-1/2 rounded-2xl border border-slate-200 bg-white/95 p-3 shadow-xl backdrop-blur md:hidden">
               {links.map((item) => (
                 <Link
                   key={`mobile-${item.label}`}
@@ -68,7 +68,7 @@ export function NavBar() {
                     }
                     setIsOpen(false);
                   }}
-                  className="block rounded-xl px-3 py-2 text-sm font-semibold text-slate-800 hover:bg-blue-50"
+                  className="block rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-800 hover:bg-blue-50"
                 >
                   {item.label}
                 </Link>

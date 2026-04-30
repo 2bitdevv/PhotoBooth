@@ -215,7 +215,7 @@ export function CustomizeScreen() {
 
   return (
     <section className="mx-auto mt-0 max-w-6xl px-4 pb-12">
-      <div className="mb-3 flex flex-wrap gap-2">
+      <div className="sticky top-24 z-20 mb-3 flex flex-wrap gap-2 rounded-2xl border border-slate-200 bg-white/85 p-2 backdrop-blur">
         <Button onClick={goBackToCapture}>Back to Capture</Button>
         <Button onClick={retakeAllPhotos}>Retake All</Button>
       </div>
