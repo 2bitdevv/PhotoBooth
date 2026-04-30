@@ -78,6 +78,38 @@ function drawPhotoPath(
   drawRoundedRectPath(ctx, x, y, width, height, 20);
 }
 
+function drawImageCover(
+  ctx: CanvasRenderingContext2D,
+  image: HTMLImageElement,
+  dx: number,
+  dy: number,
+  dWidth: number,
+  dHeight: number
+) {
+  const sourceWidth = image.naturalWidth || image.width;
+  const sourceHeight = image.naturalHeight || image.height;
+  if (sourceWidth === 0 || sourceHeight === 0) return;
+
+  const sourceAspect = sourceWidth / sourceHeight;
+  const destAspect = dWidth / dHeight;
+
+  let sx = 0;
+  let sy = 0;
+  let sWidth = sourceWidth;
+  let sHeight = sourceHeight;
+
+  // Crop to fill destination without stretching (CSS object-fit: cover behavior).
+  if (sourceAspect > destAspect) {
+    sWidth = sourceHeight * destAspect;
+    sx = (sourceWidth - sWidth) / 2;
+  } else {
+    sHeight = sourceWidth / destAspect;
+    sy = (sourceHeight - sHeight) / 2;
+  }
+
+  ctx.drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+}
+
 export async function mergeStripToDataUrl({
   photos,
   layout,
@@ -122,7 +154,7 @@ export async function mergeStripToDataUrl({
     ctx.save();
     drawPhotoPath(ctx, photoShape, x, y, layout.imageWidth, layout.imageHeight);
     ctx.clip();
-    ctx.drawImage(img, x, y, layout.imageWidth, layout.imageHeight);
+    drawImageCover(ctx, img, x, y, layout.imageWidth, layout.imageHeight);
     ctx.restore();
 
     ctx.save();

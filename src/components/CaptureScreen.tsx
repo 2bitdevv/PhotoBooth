@@ -9,8 +9,9 @@ import { useBoothStore } from "@/store/useBoothStore";
 
 const videoConstraints = {
   facingMode: "user",
-  width: 1280,
-  height: 720,
+  aspectRatio: 16 / 9,
+  width: { ideal: 1280 },
+  height: { ideal: 720 },
 };
 
 export function CaptureScreen() {
@@ -107,16 +108,18 @@ export function CaptureScreen() {
           </Button>
         </div>
 
-        <div className="photo-container min-h-[340px] sm:min-h-[420px]">
-          <div className="camera-container relative min-h-[340px] sm:min-h-[420px] overflow-hidden rounded-3xl border-2 border-slate-900 bg-black shadow-[6px_6px_0_0_#1e293b]">
+        <div className="photo-container">
+          <div className="camera-container relative h-[260px] w-full overflow-hidden rounded-3xl border-2 border-slate-900 bg-black shadow-[6px_6px_0_0_#1e293b] sm:h-[360px] md:h-[420px]">
             {captureMode === "camera" ? (
               <>
                 <Webcam
                   ref={webcamRef}
                   mirrored
                   screenshotFormat="image/jpeg"
+                  screenshotQuality={0.95}
+                  forceScreenshotSourceSize
                   videoConstraints={videoConstraints}
-                  className="video-feed h-full min-h-[340px] w-full sm:min-h-[420px]"
+                  className="video-feed h-full w-full"
                   style={{ filter: filterCss, width: "100%", height: "100%", objectFit: "cover" }}
                 />
                 <AnimatePresence>
@@ -134,7 +137,7 @@ export function CaptureScreen() {
                 </AnimatePresence>
               </>
             ) : (
-              <div className="flex min-h-[450px] flex-col items-center justify-center bg-white p-6 text-center">
+              <div className="flex h-[260px] flex-col items-center justify-center bg-white p-6 text-center sm:h-[360px] md:h-[420px]">
                 <p className="text-lg font-bold text-slate-800">Upload images for {selectedLayout.name}</p>
                 <p className="mt-1 text-sm text-slate-600">
                   Please select exactly {selectedLayout.poses} images.
@@ -195,7 +198,12 @@ export function CaptureScreen() {
           </p>
           <div className="mt-3 grid grid-cols-2 gap-2">
             {capturedPhotos.map((photo, idx) => (
-              <img key={`${photo}-${idx}`} src={photo} alt={`shot-${idx + 1}`} className="rounded-xl border-2 border-slate-700" />
+              <img
+                key={`${photo}-${idx}`}
+                src={photo}
+                alt={`shot-${idx + 1}`}
+                className="aspect-video h-auto w-full rounded-xl border-2 border-slate-700 object-cover"
+              />
             ))}
           </div>
         </div>
