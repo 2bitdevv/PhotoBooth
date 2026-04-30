@@ -36,7 +36,7 @@ export default function RootLayout({
           {children}
           <footer className="border-t border-blue-200/70 bg-white/70 py-4 text-center text-sm font-semibold text-slate-700 backdrop-blur">
             <span className="inline-flex items-center justify-center gap-2">
-              Build by{" "}
+              Made by{" "}
               <a
                 href="https://github.com/2bitdevv"
                 target="_blank"

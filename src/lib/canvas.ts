@@ -48,12 +48,13 @@ function drawHeartPath(
   const py = (n: number) => y + n * sy;
 
   ctx.beginPath();
-  ctx.moveTo(px(50), py(82));
-  ctx.lineTo(px(20), py(52));
-  ctx.bezierCurveTo(px(5), py(35), px(15), py(15), px(35), py(15));
-  ctx.bezierCurveTo(px(45), py(15), px(50), py(25), px(50), py(25));
-  ctx.bezierCurveTo(px(50), py(25), px(55), py(15), px(65), py(15));
-  ctx.bezierCurveTo(px(85), py(15), px(95), py(35), px(80), py(52));
+  // Taller, cleaner heart: less bottom drop so it doesn't look bulky.
+  ctx.moveTo(px(50), py(76));
+  ctx.lineTo(px(22), py(50));
+  ctx.bezierCurveTo(px(8), py(36), px(16), py(16), px(35), py(16));
+  ctx.bezierCurveTo(px(44), py(16), px(49), py(24), px(50), py(24));
+  ctx.bezierCurveTo(px(51), py(24), px(56), py(16), px(65), py(16));
+  ctx.bezierCurveTo(px(84), py(16), px(92), py(36), px(78), py(50));
   ctx.closePath();
 }
 
@@ -73,10 +74,14 @@ function drawPhotoPath(
     return;
   }
   if (shape === "heart") {
-    // Keep heart slots centered with comfortable breathing space like the reference style.
-    const insetX = width * 0.008;
-    const insetY = height * 0.012;
-    drawHeartPath(ctx, x + insetX, y + insetY, width - insetX * 2, height - insetY * 2);
+    // Make heart frame visually comparable in size to other frame shapes.
+    const scaleX = 1.04;
+    const scaleY = 1.16;
+    const expandedWidth = width * scaleX;
+    const expandedHeight = height * scaleY;
+    const offsetX = (expandedWidth - width) / 2;
+    const offsetY = (expandedHeight - height) / 2;
+    drawHeartPath(ctx, x - offsetX, y - offsetY, expandedWidth, expandedHeight);
     return;
   }
   drawRoundedRectPath(ctx, x, y, width, height, 20);
@@ -127,10 +132,14 @@ function fillFrameBackground(
     return;
   }
 
+  // Keep selected frame color as the base so color swatches still work in heart mode.
+  ctx.fillStyle = frameColor;
+  ctx.fillRect(0, 0, width, height);
+
   const baseGradient = ctx.createLinearGradient(0, 0, 0, height);
-  baseGradient.addColorStop(0, "#ffe7ef");
-  baseGradient.addColorStop(0.55, "#ffdce8");
-  baseGradient.addColorStop(1, "#fff6ef");
+  baseGradient.addColorStop(0, "rgba(255, 255, 255, 0.24)");
+  baseGradient.addColorStop(0.55, "rgba(255, 240, 246, 0.14)");
+  baseGradient.addColorStop(1, "rgba(255, 255, 255, 0.28)");
   ctx.fillStyle = baseGradient;
   ctx.fillRect(0, 0, width, height);
 
@@ -189,8 +198,10 @@ export async function mergeStripToDataUrl({
 
     ctx.save();
     drawPhotoPath(ctx, photoShape, x, y, layout.imageWidth, layout.imageHeight);
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
     ctx.strokeStyle = photoBorderColor;
-    ctx.lineWidth = photoShape === "heart" ? 2 : 8;
+    ctx.lineWidth = 8;
     ctx.stroke();
     ctx.restore();
 
