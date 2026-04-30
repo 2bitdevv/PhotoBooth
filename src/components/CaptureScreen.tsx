@@ -237,19 +237,27 @@ export function CaptureScreen() {
           </div>
         </div>
 
-        <aside className="space-y-3 lg:col-span-4">
-          <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+        <aside className="flex flex-col gap-3 lg:col-span-4">
+          <div className="order-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm lg:order-1">
             <h3 className="text-base font-bold text-slate-800">Live Preview</h3>
-            <div className="mt-2 rounded-xl border border-slate-200 bg-slate-50 p-2">
+            <div
+              className={`mt-2 flex items-center justify-center rounded-xl border border-slate-200 bg-slate-50 p-3 lg:p-2 ${
+                livePreview ? "min-h-[min(42vh,240px)] lg:min-h-0" : ""
+              }`}
+            >
               {livePreview ? (
-                <img src={livePreview} alt="live strip preview" className="mx-auto max-h-36 rounded-lg object-contain" />
+                <img
+                  src={livePreview}
+                  alt="live strip preview"
+                  className="mx-auto h-auto w-full max-w-full max-h-[min(50vh,320px)] rounded-lg object-contain lg:max-h-44"
+                />
               ) : (
                 <p className="text-sm text-slate-600">Capture at least 1 photo to preview your strip.</p>
               )}
             </div>
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+          <div className="order-1 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm lg:order-2">
             <h3 className="text-base font-bold text-slate-800">Filters</h3>
             <div className="mt-2 flex flex-wrap gap-2">
               {FILTERS.map((filter) => (
@@ -264,7 +272,7 @@ export function CaptureScreen() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+          <div className="order-2 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm lg:order-3">
             <div className="mb-2 flex items-center justify-between">
               <h3 className="text-base font-bold text-slate-800">Shots</h3>
               <span className="text-sm font-semibold text-slate-600">{shotProgressText}</span>

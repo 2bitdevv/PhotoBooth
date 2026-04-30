@@ -301,7 +301,7 @@ export function CustomizeScreen() {
         </div>
         <div className="mt-2">
           <p className="mb-2 text-center text-sm font-bold text-slate-700">Stickers</p>
-          <div className="grid max-h-[300px] grid-cols-4 gap-2 overflow-y-auto pr-1">
+          <div className="grid max-h-[360px] grid-cols-4 gap-3 overflow-y-auto rounded-2xl border border-slate-200 bg-white/70 p-2 pr-2 shadow-sm">
             <button
               type="button"
               onClick={() => {
@@ -310,7 +310,7 @@ export function CustomizeScreen() {
                 setStickers([]);
                 setFrameColor("#ffffff");
               }}
-              className="group relative h-16 w-full rounded-xl border transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_18px_rgba(15,23,42,0.12)]"
+              className="group relative h-19 w-full rounded-xl border transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_18px_rgba(15,23,42,0.12)]"
               title="No Sticker"
               aria-label="no sticker"
               style={{
@@ -331,7 +331,7 @@ export function CustomizeScreen() {
                   key={preset.id}
                   type="button"
                   onClick={() => handleApplyFramePreset(preset.id)}
-                  className="group relative h-16 w-full rounded-xl border transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_18px_rgba(15,23,42,0.12)]"
+                  className="group relative h-19 w-full rounded-xl border transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_18px_rgba(15,23,42,0.12)]"
                   title={preset.name}
                   aria-label={`preset ${preset.name}`}
                   style={{
