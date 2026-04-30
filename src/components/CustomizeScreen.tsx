@@ -71,6 +71,7 @@ export function CustomizeScreen() {
   const addedStickers = useBoothStore((state) => state.addedStickers);
   const setStickers = useBoothStore((state) => state.setStickers);
   const setFinalMergedImage = useBoothStore((state) => state.setFinalMergedImage);
+  const setCapturedPhotos = useBoothStore((state) => state.setCapturedPhotos);
   const setAppState = useBoothStore((state) => state.setAppState);
   const [activePresetId, setActivePresetId] = useState(FRAME_PRESETS[0].id);
   const [stickerMode, setStickerMode] = useState<"preset" | "none">("none");
@@ -199,8 +200,25 @@ export function CustomizeScreen() {
     void run();
   };
 
+  const goBackToCapture = () => {
+    setFinalMergedImage(null);
+    setAppState("CAPTURE");
+  };
+
+  const retakeAllPhotos = () => {
+    setCapturedPhotos([]);
+    setStickers([]);
+    setFrameColor("#ffffff");
+    setFinalMergedImage(null);
+    setAppState("CAPTURE");
+  };
+
   return (
     <section className="mx-auto mt-0 max-w-6xl px-4 pb-12">
+      <div className="mb-3 flex flex-wrap gap-2">
+        <Button onClick={goBackToCapture}>Back to Capture</Button>
+        <Button onClick={retakeAllPhotos}>Retake All</Button>
+      </div>
       <h2 className="text-2xl font-black text-slate-800 sm:text-3xl">Photo Strip Preview</h2>
       <div className="mx-auto mt-3 inline-block rounded-xl bg-pink-100/60 px-4 py-2">
         <p className="text-sm text-slate-700">

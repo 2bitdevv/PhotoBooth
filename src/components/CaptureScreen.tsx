@@ -1,10 +1,11 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState, type ChangeEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import Webcam from "react-webcam";
 import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { FILTERS, getFilterCss } from "@/lib/filters";
+import { mergeStripToDataUrl } from "@/lib/canvas";
 import { useBoothStore } from "@/store/useBoothStore";
 
 const videoConstraints = {
@@ -20,6 +21,9 @@ export function CaptureScreen() {
   const capturedPhotos = useBoothStore((state) => state.capturedPhotos);
   const addCapturedPhoto = useBoothStore((state) => state.addCapturedPhoto);
   const setCapturedPhotos = useBoothStore((state) => state.setCapturedPhotos);
+  const setStickers = useBoothStore((state) => state.setStickers);
+  const setFinalMergedImage = useBoothStore((state) => state.setFinalMergedImage);
+  const setFrameColor = useBoothStore((state) => state.setFrameColor);
   const setAppState = useBoothStore((state) => state.setAppState);
   const activeFilter = useBoothStore((state) => state.activeFilter);
   const setFilter = useBoothStore((state) => state.setFilter);
@@ -30,8 +34,35 @@ export function CaptureScreen() {
   const [captureMode, setCaptureMode] = useState<"camera" | "upload">("camera");
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [livePreview, setLivePreview] = useState<string | null>(null);
 
   const filterCss = useMemo(() => getFilterCss(activeFilter), [activeFilter]);
+
+  useEffect(() => {
+    const run = async () => {
+      if (capturedPhotos.length === 0) {
+        setLivePreview(null);
+        return;
+      }
+      const dataUrl = await mergeStripToDataUrl({
+        photos: capturedPhotos,
+        layout: selectedLayout,
+        frameColor: "#ffffff",
+        stickers: [],
+        filterCss,
+      });
+      setLivePreview(dataUrl);
+    };
+    void run();
+  }, [capturedPhotos, filterCss, selectedLayout]);
+
+  const handleRetake = () => {
+    setCapturedPhotos([]);
+    setStickers([]);
+    setFinalMergedImage(null);
+    setFrameColor("#ffffff");
+    setAppState("CAPTURE");
+  };
 
   const startCapture = useCallback(async () => {
     if (isCapturing) return;
@@ -99,6 +130,10 @@ export function CaptureScreen() {
   return (
     <section className="mx-auto mt-3 grid max-w-6xl grid-cols-1 gap-8 px-4 pb-10 lg:grid-cols-[2fr_1fr]">
       <div>
+        <div className="mb-3 flex flex-wrap gap-2">
+          <Button onClick={() => setAppState("LAYOUT_SELECT")}>Back to Layout</Button>
+          <Button onClick={handleRetake}>Retake All</Button>
+        </div>
         <div className="mb-4 flex gap-2">
           <Button variant={captureMode === "camera" ? "primary" : "default"} onClick={() => setCaptureMode("camera")}>
             Camera
@@ -179,7 +214,15 @@ export function CaptureScreen() {
         )}
       </div>
       <aside>
-        <h3 className="text-lg font-bold text-slate-800">Filters</h3>
+        <h3 className="text-lg font-bold text-slate-800">Live Preview</h3>
+        <div className="mt-3 rounded-2xl border-2 border-slate-800 bg-white p-3 shadow-[4px_4px_0_0_#1e293b]">
+          {livePreview ? (
+            <img src={livePreview} alt="live strip preview" className="mx-auto max-h-56 rounded-lg border border-slate-200 object-contain" />
+          ) : (
+            <p className="text-sm text-slate-600">Capture at least 1 photo to preview your strip.</p>
+          )}
+        </div>
+        <h3 className="mt-6 text-lg font-bold text-slate-800">Filters</h3>
         <div className="mt-3 flex flex-wrap gap-2">
           {FILTERS.map((filter) => (
             <Button
