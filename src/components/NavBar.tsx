@@ -20,8 +20,8 @@ export function NavBar() {
 
   return (
     <>
-      <header className="mx-auto flex w-full justify-center px-4 pt-3">
-        <nav className="relative flex w-fit items-center gap-2 rounded-full border border-white/70 bg-white/55 px-3 py-2 shadow-lg backdrop-blur-md">
+      <header className="relative z-90 mx-auto flex w-full justify-center px-4 pt-3">
+        <nav className="relative z-95 flex w-fit items-center gap-2 rounded-full border border-white/70 bg-white/55 px-3 py-2 shadow-lg backdrop-blur-md">
           <Link href="/" onClick={resetSession} className="mr-1 flex items-center rounded-full px-2 py-1 hover:bg-white/80">
             <Image src="/logo.png" alt="PhotoBoot logo" width={28} height={28} className="rounded-md" />
           </Link>
@@ -57,7 +57,7 @@ export function NavBar() {
           </button>
 
           {isOpen && (
-            <div className="absolute left-1/2 top-16 z-30 w-[88vw] max-w-xs -translate-x-1/2 rounded-2xl border border-slate-200 bg-white/95 p-3 shadow-xl backdrop-blur md:hidden">
+            <div className="absolute left-1/2 top-16 z-120 w-[88vw] max-w-xs -translate-x-1/2 rounded-2xl border border-slate-200 bg-white/95 p-3 shadow-xl backdrop-blur md:hidden">
               {links.map((item) => (
                 <Link
                   key={`mobile-${item.label}`}

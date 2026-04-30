@@ -75,8 +75,8 @@ function drawPhotoPath(
   }
   if (shape === "heart") {
     // Make heart frame visually comparable in size to other frame shapes.
-    const scaleX = 1.04;
-    const scaleY = 1.16;
+    const scaleX = 1.2;
+    const scaleY = 1.32;
     const expandedWidth = width * scaleX;
     const expandedHeight = height * scaleY;
     const offsetX = (expandedWidth - width) / 2;

@@ -310,16 +310,16 @@ export function CustomizeScreen() {
                 setStickers([]);
                 setFrameColor("#ffffff");
               }}
-              className="relative h-16 w-full rounded-xl border transition"
+              className="group relative h-16 w-full rounded-xl border transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_18px_rgba(15,23,42,0.12)]"
               title="No Sticker"
               aria-label="no sticker"
               style={{
                 borderColor: stickerMode === "none" ? "#f43f5e" : "#d1d5db",
                 background: "#f3f4f6",
-                boxShadow: stickerMode === "none" ? "0 0 0 2px #fb7185" : "none",
+                boxShadow: stickerMode === "none" ? "0 0 0 2px #fb7185, 0 10px 18px rgba(251,113,133,0.24)" : "none",
               }}
             >
-              <svg viewBox="0 0 24 24" className="mx-auto h-8 w-8 text-slate-500" aria-hidden="true">
+              <svg viewBox="0 0 24 24" className="mx-auto h-8 w-8 text-slate-500 transition-transform duration-200 group-hover:scale-105" aria-hidden="true">
                 <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="2" />
                 <path d="M6 18L18 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
               </svg>
@@ -331,22 +331,22 @@ export function CustomizeScreen() {
                   key={preset.id}
                   type="button"
                   onClick={() => handleApplyFramePreset(preset.id)}
-                  className="relative h-16 w-full rounded-xl border transition"
+                  className="group relative h-16 w-full rounded-xl border transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_18px_rgba(15,23,42,0.12)]"
                   title={preset.name}
                   aria-label={`preset ${preset.name}`}
                   style={{
                     borderColor: isActive ? "#f43f5e" : "#d1d5db",
                     background: preset.panelBg,
-                    boxShadow: isActive ? "0 0 0 2px #fb7185" : "none",
+                    boxShadow: isActive ? "0 0 0 2px #fb7185, 0 10px 18px rgba(251,113,133,0.24)" : "none",
                   }}
                 >
                   <img
                     src={STICKER_ASSETS[preset.stickers[0]]}
                     alt=""
                     aria-hidden="true"
-                    className="mx-auto h-9 w-9"
+                    className="mx-auto h-9 w-9 transition-transform duration-200 group-hover:scale-105"
                   />
-                  <span className="absolute right-1.5 top-1.5 text-slate-500">
+                  <span className="absolute right-1.5 top-1.5 text-slate-500 transition-transform duration-200 group-hover:scale-105">
                     <ShapeIcon shape={preset.photoShape} />
                   </span>
                 </button>
