@@ -26,6 +26,7 @@ Users can:
 - Contact form with real email sending (SMTP via Gmail)
 - Post-download review modal (star rating + optional comment)
 - Review duplicate prevention on same device (localStorage flag)
+- Route-level loading UI (`app/(site)/loading.tsx`) plus a short in-flow overlay between booth steps
 
 ---
 
@@ -42,21 +43,28 @@ Users can:
 
 ## Project Structure
 
+URLs stay the same (`/`, `/contact`, …). UI routes live under a **route group** `(site)` so one `loading.tsx` can wrap every page in that group.
+
 ```txt
 src/
   app/
+    (site)/                   # route group (not part of URL)
+      layout.tsx
+      loading.tsx             # shared loading UI for all pages in group
+      page.tsx                # home / photobooth
+      contact/page.tsx
+      faq/page.tsx
+      privacy-policy/page.tsx
     api/
       contact/route.ts        # contact email API
       reviews/route.ts        # review submission API
-      strip/route.ts          # upload generated strip (temp cache)
-      strip/[id]/route.ts     # fetch strip by id
-    contact/page.tsx          # contact UI
-    faq/page.tsx
-    privacy-policy/page.tsx
+      strip/route.ts          # POST strip → { url } (Blob or in-memory + GET id)
+      strip/[id]/route.ts     # GET strip by id (in-memory fallback)
     layout.tsx
-    page.tsx
+    globals.css
   components/
-    BoothFlow.tsx
+    BoothFlow.tsx             # step machine + optional step overlay
+    RouteLoading.tsx          # Vercel-style bar + spinner (used by loading + BoothFlow)
     WelcomeScreen.tsx
     LayoutSelector.tsx
     CaptureScreen.tsx
