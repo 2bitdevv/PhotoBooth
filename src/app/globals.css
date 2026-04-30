@@ -18,3 +18,25 @@ body {
   background: linear-gradient(to bottom, #dbeafe, #eff6ff, #ffffff);
   font-family: Nunito, sans-serif;
 }
+
+@keyframes photoboot-loader-indeterminate {
+  0% {
+    transform: translate3d(-120%, 0, 0);
+  }
+  100% {
+    transform: translate3d(320%, 0, 0);
+  }
+}
+
+.photoboot-loader-bar {
+  background: linear-gradient(
+    90deg,
+    rgb(37 99 235 / 0) 0%,
+    rgb(37 99 235 / 0.75) 42%,
+    rgb(96 165 250 / 1) 50%,
+    rgb(37 99 235 / 0.75) 58%,
+    rgb(37 99 235 / 0) 100%
+  );
+  animation: photoboot-loader-indeterminate 1.12s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  will-change: transform;
+}

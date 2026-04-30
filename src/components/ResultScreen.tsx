@@ -90,10 +90,9 @@ export function ResultScreen() {
         const message = typeof err?.error === "string" ? err.error : "Could not prepare link.";
         throw new Error(message);
       }
-      const { id } = (await upload.json()) as { id?: string };
-      if (!id) throw new Error("Invalid server response.");
-
-      const downloadUrl = `${window.location.origin}/api/strip/${id}`;
+      const data = (await upload.json()) as { url?: string };
+      const downloadUrl = typeof data.url === "string" ? data.url : null;
+      if (!downloadUrl) throw new Error("Invalid server response.");
       const qrData = await QRCode.toDataURL(downloadUrl, {
         width: 280,
         margin: 2,

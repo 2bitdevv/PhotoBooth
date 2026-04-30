@@ -22,7 +22,7 @@ Users can:
   - rounded / circle / heart photo masks
   - draggable SVG stickers
   - final merged export
-- QR-based temporary download link (`/api/strip`)
+- QR download link (Vercel Blob when configured; otherwise same-server `/api/strip/:id`)
 - Contact form with real email sending (SMTP via Gmail)
 - Post-download review modal (star rating + optional comment)
 - Review duplicate prevention on same device (localStorage flag)
@@ -102,6 +102,10 @@ Create `.env.local` in project root:
 SMTP_USER=example@gmail.com
 SMTP_PASS=your_google_app_password
 CONTACT_RECEIVER_EMAIL=example@gmail.com
+
+# Optional but required for reliable QR downloads on Vercel (serverless):
+# Create a Blob store in the Vercel project; this is set automatically when linked.
+BLOB_READ_WRITE_TOKEN=vercel_blob_rw_...
 ```
 
 > Use Google **App Password**, not your normal Gmail password.
@@ -133,10 +137,10 @@ If SMTP is missing, API currently returns success fallback (`queued: false`) so 
 
 - `POST /api/strip`
   - payload: `{ dataUrl }`
-  - returns `{ id }` for temporary image cache
+  - returns `{ url }` — absolute URL to the image (public Blob URL if `BLOB_READ_WRITE_TOKEN` is set, otherwise `{origin}/api/strip/:id` using in-memory cache)
 
 - `GET /api/strip/:id`
-  - returns generated strip image by id
+  - returns generated strip image by id (in-memory only; unreliable on multi-instance hosts without Blob)
 
 ---
 
@@ -156,7 +160,8 @@ npm run start
 
 For Vercel:
 1. Add Environment Variables in Project Settings.
-2. Redeploy after env changes.
+2. **QR “scan to download”:** add [Vercel Blob](https://vercel.com/docs/storage/vercel-blob) to the project so `BLOB_READ_WRITE_TOKEN` exists. Without it, `POST` and `GET` for strips can hit different server instances and the link opens empty or 404.
+3. Redeploy after env changes.
 
 ---
 

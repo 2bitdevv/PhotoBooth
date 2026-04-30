@@ -1,3 +1,5 @@
+import { randomBytes } from "crypto";
+import { put } from "@vercel/blob";
 import { NextResponse } from "next/server";
 import { saveStripImage } from "@/lib/stripCache";
 
@@ -47,6 +49,35 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid or too large image" }, { status: 400 });
   }
 
+  const origin = new URL(request.url).origin;
+  const blobToken = process.env.BLOB_READ_WRITE_TOKEN?.trim();
+
+  if (blobToken) {
+    try {
+      const ext =
+        parsed.contentType === "image/jpeg"
+          ? "jpg"
+          : parsed.contentType === "image/png"
+            ? "png"
+            : parsed.contentType === "image/webp"
+              ? "webp"
+              : "bin";
+      const pathname = `strips/${randomBytes(16).toString("base64url")}.${ext}`;
+      const blob = await put(pathname, parsed.buffer, {
+        access: "public",
+        contentType: parsed.contentType,
+        token: blobToken,
+      });
+      return NextResponse.json({ url: blob.url });
+    } catch (e) {
+      console.error("[api/strip] blob upload failed", e);
+      return NextResponse.json(
+        { error: "Could not store image for QR download. Check Blob storage and BLOB_READ_WRITE_TOKEN." },
+        { status: 500 }
+      );
+    }
+  }
+
   const id = saveStripImage(parsed.buffer, parsed.contentType);
-  return NextResponse.json({ id });
+  return NextResponse.json({ url: `${origin}/api/strip/${id}` });
 }
