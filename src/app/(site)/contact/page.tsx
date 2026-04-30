@@ -70,13 +70,6 @@ export default function ContactPage() {
                   <p className="text-sm text-slate-600">Bangkok, Thailand</p>
                 </div>
               </div>
-              {/* <div className="flex gap-3">
-                <Phone className="mt-0.5 h-5 w-5" />
-                <div>
-                  <p className="font-bold">Call us</p>
-                  <p className="text-sm text-slate-600">+66 99-999-9999</p>
-                </div>
-              </div> */}
               <div className="flex gap-3">
                 <Mail className="mt-0.5 h-5 w-5" />
                 <div>

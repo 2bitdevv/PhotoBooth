@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { LAYOUTS } from "@/lib/layouts";
 import { cn } from "@/lib/classnames";
@@ -37,6 +37,8 @@ function LayoutPreviewImage({
     <img
       src={src}
       alt={`${poses} poses preview`}
+      loading="eager"
+      decoding="async"
       className={cn(
         "h-auto w-full rounded-xl border object-contain transition",
         sizeClass,
@@ -51,28 +53,6 @@ export function LayoutSelector() {
   const selectedLayout = useBoothStore((state) => state.selectedLayout);
   const setLayout = useBoothStore((state) => state.setLayout);
   const setAppState = useBoothStore((state) => state.setAppState);
-  const [imagesReady, setImagesReady] = useState(false);
-
-  useEffect(() => {
-    const sources = Object.values(previewImageByPoses);
-    let active = true;
-    void Promise.all(
-      sources.map(
-        (src) =>
-          new Promise<void>((resolve) => {
-            const image = new Image();
-            image.onload = () => resolve();
-            image.onerror = () => resolve();
-            image.src = src;
-          })
-      )
-    ).then(() => {
-      if (active) setImagesReady(true);
-    });
-    return () => {
-      active = false;
-    };
-  }, []);
 
   return (
     <section className="mx-auto max-w-6xl px-4 pb-12 text-center">
@@ -89,14 +69,7 @@ export function LayoutSelector() {
               selectedLayout.id === layout.id ? "border-blue-500" : "border-slate-200 hover:border-blue-300"
             )}
           >
-            {imagesReady ? (
-              <LayoutPreviewImage
-                poses={layout.poses}
-                isSelected={selectedLayout.id === layout.id}
-              />
-            ) : (
-              <div className="h-44 w-full animate-pulse rounded-xl bg-slate-100" />
-            )}
+            <LayoutPreviewImage poses={layout.poses} isSelected={selectedLayout.id === layout.id} />
             <p className="mt-2 text-sm font-bold text-slate-900 sm:text-base">{layout.name}</p>
             <p className="text-xs text-slate-600">{layout.poses} Pose</p>
           </button>

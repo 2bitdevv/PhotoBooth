@@ -1,8 +1,10 @@
+"use client";
+
 export default function RouteLoading() {
   return (
     <>
       <div
-        className="pointer-events-none fixed top-0 right-0 left-0 z-[300] h-[3px] overflow-hidden bg-slate-200/90"
+        className="pointer-events-none fixed top-0 right-0 left-0 z-300 h-[3px] overflow-hidden bg-slate-200/90"
         aria-hidden
       >
         <div className="photoboot-loader-bar h-full w-[42%] max-w-lg" />
