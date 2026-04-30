@@ -41,18 +41,19 @@ function drawHeartPath(
   width: number,
   height: number
 ) {
-  const topY = y + height * 0.25;
-  const bottomY = y + height;
-  const centerX = x + width / 2;
-  const leftX = x;
-  const rightX = x + width;
+  // Normalized from user-provided SVG path in viewBox 100x90.
+  const sx = width / 100;
+  const sy = height / 90;
+  const px = (n: number) => x + n * sx;
+  const py = (n: number) => y + n * sy;
 
   ctx.beginPath();
-  ctx.moveTo(centerX, bottomY);
-  ctx.bezierCurveTo(centerX - width * 0.48, y + height * 0.72, leftX, y + height * 0.42, leftX, topY);
-  ctx.bezierCurveTo(leftX, y, centerX - width * 0.15, y, centerX, y + height * 0.24);
-  ctx.bezierCurveTo(centerX + width * 0.15, y, rightX, y, rightX, topY);
-  ctx.bezierCurveTo(rightX, y + height * 0.42, centerX + width * 0.48, y + height * 0.72, centerX, bottomY);
+  ctx.moveTo(px(50), py(82));
+  ctx.lineTo(px(20), py(52));
+  ctx.bezierCurveTo(px(5), py(35), px(15), py(15), px(35), py(15));
+  ctx.bezierCurveTo(px(45), py(15), px(50), py(25), px(50), py(25));
+  ctx.bezierCurveTo(px(50), py(25), px(55), py(15), px(65), py(15));
+  ctx.bezierCurveTo(px(85), py(15), px(95), py(35), px(80), py(52));
   ctx.closePath();
 }
 
@@ -72,7 +73,10 @@ function drawPhotoPath(
     return;
   }
   if (shape === "heart") {
-    drawHeartPath(ctx, x, y, width, height);
+    // Keep heart slots centered with comfortable breathing space like the reference style.
+    const insetX = width * 0.008;
+    const insetY = height * 0.012;
+    drawHeartPath(ctx, x + insetX, y + insetY, width - insetX * 2, height - insetY * 2);
     return;
   }
   drawRoundedRectPath(ctx, x, y, width, height, 20);
@@ -110,6 +114,33 @@ function drawImageCover(
   ctx.drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
 }
 
+function fillFrameBackground(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  frameColor: string,
+  photoShape: PhotoShape
+) {
+  if (photoShape !== "heart") {
+    ctx.fillStyle = frameColor;
+    ctx.fillRect(0, 0, width, height);
+    return;
+  }
+
+  const baseGradient = ctx.createLinearGradient(0, 0, 0, height);
+  baseGradient.addColorStop(0, "#ffe7ef");
+  baseGradient.addColorStop(0.55, "#ffdce8");
+  baseGradient.addColorStop(1, "#fff6ef");
+  ctx.fillStyle = baseGradient;
+  ctx.fillRect(0, 0, width, height);
+
+  const glowGradient = ctx.createRadialGradient(width * 0.5, height * 0.25, width * 0.05, width * 0.5, height * 0.25, width * 0.7);
+  glowGradient.addColorStop(0, "rgba(255, 255, 255, 0.24)");
+  glowGradient.addColorStop(1, "rgba(255, 255, 255, 0)");
+  ctx.fillStyle = glowGradient;
+  ctx.fillRect(0, 0, width, height);
+}
+
 export async function mergeStripToDataUrl({
   photos,
   layout,
@@ -137,8 +168,7 @@ export async function mergeStripToDataUrl({
     throw new Error("Canvas not supported");
   }
 
-  ctx.fillStyle = frameColor;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  fillFrameBackground(ctx, canvas.width, canvas.height, frameColor, photoShape);
 
   const frameInnerWidth = cols * layout.imageWidth + (cols - 1) * layout.gap;
   const startX = (layout.stripWidth - frameInnerWidth) / 2;
@@ -160,9 +190,23 @@ export async function mergeStripToDataUrl({
     ctx.save();
     drawPhotoPath(ctx, photoShape, x, y, layout.imageWidth, layout.imageHeight);
     ctx.strokeStyle = photoBorderColor;
-    ctx.lineWidth = 8;
+    ctx.lineWidth = photoShape === "heart" ? 2 : 8;
     ctx.stroke();
     ctx.restore();
+
+    if (photoShape === "heart") {
+      // Soft inner depth to keep the heart slot dreamy and less flat.
+      ctx.save();
+      drawPhotoPath(ctx, photoShape, x, y, layout.imageWidth, layout.imageHeight);
+      ctx.clip();
+      const depthOverlay = ctx.createLinearGradient(x, y, x, y + layout.imageHeight);
+      depthOverlay.addColorStop(0, "rgba(255,255,255,0.16)");
+      depthOverlay.addColorStop(0.7, "rgba(255,255,255,0)");
+      depthOverlay.addColorStop(1, "rgba(15,23,42,0.08)");
+      ctx.fillStyle = depthOverlay;
+      ctx.fillRect(x, y, layout.imageWidth, layout.imageHeight);
+      ctx.restore();
+    }
   }
   ctx.filter = "none";
 
@@ -174,8 +218,8 @@ export async function mergeStripToDataUrl({
     ctx.drawImage(stickerImage, x - half, y - half, sticker.size, sticker.size);
   }
 
-  ctx.fillStyle = "#0f172a";
-  ctx.font = "24px Arial";
+  ctx.fillStyle = "rgba(71, 85, 105, 0.9)";
+  ctx.font = "18px Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI";
   ctx.textAlign = "center";
   ctx.fillText(`PhotoBoot ${new Date().toLocaleString()}`, canvas.width / 2, canvas.height - 30);
 

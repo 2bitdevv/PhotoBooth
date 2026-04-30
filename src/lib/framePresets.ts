@@ -19,9 +19,9 @@ export const FRAME_PRESETS: FramePreset[] = [
     accent: "#ec4899",
     panelBg: "#ffe4ef",
     frameColor: "#fde2ef",
-    photoBorderColor: "#f472b6",
+    photoBorderColor: "#f9a8d4",
     photoShape: "heart",
-    stickers: ["heartSparkle", "pinkBow", "teddyFace", "sparkleCluster"],
+    stickers: ["heartSparkle", "heartOutline", "sparkleCluster", "heartSparkle"],
   },
   {
     id: "sky-bubble",

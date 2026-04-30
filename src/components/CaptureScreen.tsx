@@ -36,6 +36,7 @@ export function CaptureScreen() {
   const [isUploading, setIsUploading] = useState(false);
   const [livePreview, setLivePreview] = useState<string | null>(null);
   const captureComplete = capturedPhotos.length >= selectedLayout.poses;
+  const shotProgressText = `${capturedPhotos.length} / ${selectedLayout.poses}`;
 
   const filterCss = useMemo(() => getFilterCss(activeFilter), [activeFilter]);
 
@@ -126,143 +127,161 @@ export function CaptureScreen() {
   );
 
   return (
-    <section className="mx-auto mt-3 grid max-w-6xl grid-cols-1 gap-8 px-4 pb-10 lg:grid-cols-[2fr_1fr]">
-      <div>
-        <div className="sticky top-24 z-20 mb-3 flex flex-wrap gap-2 rounded-2xl border border-slate-200 bg-white/85 p-2 backdrop-blur">
+    <section className="mx-auto mt-2 max-w-7xl px-4 pb-6">
+      <div className="mb-3 rounded-2xl border border-slate-200 bg-white/90 p-3 shadow-sm backdrop-blur">
+        <div className="flex flex-wrap items-center gap-2">
           <Button onClick={() => setAppState("LAYOUT_SELECT")}>Back to Layout</Button>
           <Button onClick={handleRetake}>Retake All</Button>
-          {captureComplete && (
-            <Button variant="primary" onClick={() => setAppState("CUSTOMIZE")}>
-              Continue
-            </Button>
-          )}
+          <span className="ml-auto rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-700">
+            Layout {selectedLayout.id} • {shotProgressText}
+          </span>
         </div>
-        <div className="mb-4 flex gap-2">
-          <Button variant={captureMode === "camera" ? "primary" : "default"} onClick={() => setCaptureMode("camera")}>
-            Camera
-          </Button>
-          <Button variant={captureMode === "upload" ? "primary" : "default"} onClick={() => setCaptureMode("upload")}>
-            Upload Images
-          </Button>
-        </div>
+      </div>
 
-        <div className="photo-container">
-          <div className="camera-container relative h-[260px] w-full overflow-hidden rounded-3xl border-2 border-slate-900 bg-black shadow-[6px_6px_0_0_#1e293b] sm:h-[360px] md:h-[420px]">
-            {captureMode === "camera" ? (
-              <>
-                <Webcam
-                  ref={webcamRef}
-                  mirrored
-                  screenshotFormat="image/jpeg"
-                  screenshotQuality={0.95}
-                  forceScreenshotSourceSize
-                  videoConstraints={videoConstraints}
-                  className="video-feed h-full w-full"
-                  style={{ filter: filterCss, width: "100%", height: "100%", objectFit: "cover" }}
-                />
-                <AnimatePresence>
-                  {countdown !== null && (
-                    <motion.div
-                      key={countdown}
-                      initial={{ scale: 0.4, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      exit={{ scale: 1.4, opacity: 0 }}
-                      className="absolute inset-0 flex items-center justify-center text-8xl font-black text-white"
-                    >
-                      <span className="rounded-3xl bg-white/30 px-6 text-slate-900 backdrop-blur-sm">{countdown}</span>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </>
-            ) : (
-              <div className="flex h-[260px] flex-col items-center justify-center bg-white p-6 text-center sm:h-[360px] md:h-[420px]">
-                <p className="text-lg font-bold text-slate-800">Upload images for {selectedLayout.name}</p>
-                <p className="mt-1 text-sm text-slate-600">
-                  Please select exactly {selectedLayout.poses} images.
-                </p>
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handleUploadFiles}
-                  className="mt-4 w-full max-w-sm rounded-xl border-2 border-slate-300 p-2"
-                />
-                {uploadError && <p className="mt-3 text-sm font-semibold text-red-600">{uploadError}</p>}
-                {isUploading && <p className="mt-3 text-sm font-semibold text-slate-700">Uploading...</p>}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
+        <div className="lg:col-span-8">
+          <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+            <div className="mb-3 flex flex-wrap gap-2">
+              <Button variant={captureMode === "camera" ? "primary" : "default"} onClick={() => setCaptureMode("camera")}>
+                Camera
+              </Button>
+              <Button variant={captureMode === "upload" ? "primary" : "default"} onClick={() => setCaptureMode("upload")}>
+                Upload Images
+              </Button>
+            </div>
+
+            {captureMode === "camera" && (
+              <div className="mb-3 flex flex-wrap items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50/80 p-2.5">
+                <label htmlFor="timer" className="text-sm font-semibold text-slate-700">
+                  Countdown
+                </label>
+                <select
+                  id="timer"
+                  className="rounded-lg border-2 border-slate-800 bg-white px-2 py-1"
+                  value={countdownSeconds}
+                  onChange={(event) => setCountdownSeconds(Number(event.target.value))}
+                >
+                  <option value={3}>3s</option>
+                  <option value={4}>4s</option>
+                  <option value={5}>5s</option>
+                </select>
+              </div>
+            )}
+
+            <div className="relative h-[clamp(280px,52vh,560px)] w-full overflow-hidden rounded-2xl border-2 border-slate-900 bg-black shadow-[6px_6px_0_0_#1e293b]">
+              {captureMode === "camera" ? (
+                <>
+                  <Webcam
+                    ref={webcamRef}
+                    mirrored
+                    screenshotFormat="image/jpeg"
+                    screenshotQuality={0.95}
+                    forceScreenshotSourceSize
+                    videoConstraints={videoConstraints}
+                    className="h-full w-full"
+                    style={{ filter: filterCss, width: "100%", height: "100%", objectFit: "cover" }}
+                  />
+                  <AnimatePresence>
+                    {countdown !== null && (
+                      <motion.div
+                        key={countdown}
+                        initial={{ scale: 0.4, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 1.4, opacity: 0 }}
+                        className="absolute inset-0 flex items-center justify-center text-7xl font-black text-white sm:text-8xl"
+                      >
+                        <span className="rounded-3xl bg-white/30 px-6 text-slate-900 backdrop-blur-sm">{countdown}</span>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </>
+              ) : (
+                <div className="flex h-full flex-col items-center justify-center bg-white p-6 text-center">
+                  <p className="text-lg font-bold text-slate-800">Upload images for {selectedLayout.name}</p>
+                  <p className="mt-1 text-sm text-slate-600">Please select exactly {selectedLayout.poses} images.</p>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleUploadFiles}
+                    className="mt-4 w-full max-w-sm rounded-xl border-2 border-slate-300 p-2"
+                  />
+                  {uploadError && <p className="mt-3 text-sm font-semibold text-red-600">{uploadError}</p>}
+                  {isUploading && <p className="mt-3 text-sm font-semibold text-slate-700">Uploading...</p>}
+                </div>
+              )}
+            </div>
+
+            {captureMode === "camera" && (
+              <div className="mt-3 flex justify-center sm:justify-end">
+                <Button
+                  variant="primary"
+                  className="px-6 py-2.5"
+                  disabled={isCapturing}
+                  onClick={() => {
+                    if (captureComplete) {
+                      setAppState("CUSTOMIZE");
+                      return;
+                    }
+                    void startCapture();
+                  }}
+                >
+                  {isCapturing
+                    ? "Capturing..."
+                    : captureComplete
+                      ? "Continue"
+                      : `Start Capture (${selectedLayout.poses} photos)`}
+                </Button>
               </div>
             )}
           </div>
         </div>
-        {captureMode === "camera" && (
-          <>
-            <div className="mt-4 flex items-center gap-3">
-              <label htmlFor="timer" className="font-semibold text-slate-700">
-                Countdown Time:
-              </label>
-              <select
-                id="timer"
-                className="rounded-lg border-2 border-slate-800 bg-white px-2 py-1"
-                value={countdownSeconds}
-                onChange={(event) => setCountdownSeconds(Number(event.target.value))}
-              >
-                <option value={3}>3s</option>
-                <option value={4}>4s</option>
-                <option value={5}>5s</option>
-              </select>
+
+        <aside className="space-y-3 lg:col-span-4">
+          <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+            <h3 className="text-base font-bold text-slate-800">Live Preview</h3>
+            <div className="mt-2 rounded-xl border border-slate-200 bg-slate-50 p-2">
+              {livePreview ? (
+                <img src={livePreview} alt="live strip preview" className="mx-auto max-h-36 rounded-lg object-contain" />
+              ) : (
+                <p className="text-sm text-slate-600">Capture at least 1 photo to preview your strip.</p>
+              )}
             </div>
-            <Button
-              variant="primary"
-              className="mt-4 px-8 py-3"
-              disabled={isCapturing || captureComplete}
-              onClick={startCapture}
-            >
-              {isCapturing
-                ? "Capturing..."
-                : captureComplete
-                  ? "Capture Complete"
-                  : `Start Capture (${selectedLayout.poses} photos)`}
-            </Button>
-          </>
-        )}
-      </div>
-      <aside>
-        <h3 className="text-lg font-bold text-slate-800">Live Preview</h3>
-        <div className="mt-3 rounded-2xl border-2 border-slate-800 bg-white p-3 shadow-[4px_4px_0_0_#1e293b]">
-          {livePreview ? (
-            <img src={livePreview} alt="live strip preview" className="mx-auto max-h-56 rounded-lg border border-slate-200 object-contain" />
-          ) : (
-            <p className="text-sm text-slate-600">Capture at least 1 photo to preview your strip.</p>
-          )}
-        </div>
-        <h3 className="mt-6 text-lg font-bold text-slate-800">Filters</h3>
-        <div className="mt-3 flex flex-wrap gap-2">
-          {FILTERS.map((filter) => (
-            <Button
-              key={filter.id}
-              variant={activeFilter === filter.id ? "primary" : "default"}
-              onClick={() => setFilter(filter.id)}
-            >
-              {filter.label}
-            </Button>
-          ))}
-        </div>
-        <div className="mt-8">
-          <h3 className="text-lg font-bold text-slate-800">Shots</h3>
-          <p className="text-slate-700">
-            {capturedPhotos.length} / {selectedLayout.poses}
-          </p>
-          <div className="mt-3 grid grid-cols-2 gap-2">
-            {capturedPhotos.map((photo, idx) => (
-              <img
-                key={`${photo}-${idx}`}
-                src={photo}
-                alt={`shot-${idx + 1}`}
-                className="aspect-video h-auto w-full rounded-xl border-2 border-slate-700 object-cover"
-              />
-            ))}
           </div>
-        </div>
-      </aside>
+
+          <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+            <h3 className="text-base font-bold text-slate-800">Filters</h3>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {FILTERS.map((filter) => (
+                <Button
+                  key={filter.id}
+                  variant={activeFilter === filter.id ? "primary" : "default"}
+                  onClick={() => setFilter(filter.id)}
+                >
+                  {filter.label}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+            <div className="mb-2 flex items-center justify-between">
+              <h3 className="text-base font-bold text-slate-800">Shots</h3>
+              <span className="text-sm font-semibold text-slate-600">{shotProgressText}</span>
+            </div>
+            <div className="grid max-h-24 grid-cols-4 gap-2 overflow-y-auto">
+              {capturedPhotos.map((photo, idx) => (
+                <img
+                  key={`${photo}-${idx}`}
+                  src={photo}
+                  alt={`shot-${idx + 1}`}
+                  className="aspect-square h-auto w-full rounded-lg border border-slate-200 object-cover"
+                />
+              ))}
+            </div>
+          </div>
+        </aside>
+      </div>
     </section>
   );
 }

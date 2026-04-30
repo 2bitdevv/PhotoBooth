@@ -20,7 +20,7 @@ export function NavBar() {
 
   return (
     <>
-      <header className="fixed top-0 z-30 mx-auto flex w-full justify-center px-4 pt-3">
+      <header className="mx-auto flex w-full justify-center px-4 pt-3">
         <nav className="relative flex w-fit items-center gap-2 rounded-full border border-white/70 bg-white/55 px-3 py-2 shadow-lg backdrop-blur-md">
           <Link href="/" onClick={resetSession} className="mr-1 flex items-center rounded-full px-2 py-1 hover:bg-white/80">
             <Image src="/logo.png" alt="PhotoBoot logo" width={28} height={28} className="rounded-md" />
@@ -89,7 +89,7 @@ export function NavBar() {
           )}
         </nav>
       </header>
-      <div className="h-24" />
+      <div className="h-4" />
     </>
   );
 }
